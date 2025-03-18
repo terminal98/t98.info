@@ -33,26 +33,14 @@
 
             <input type="hidden" id="recaptcha-token" name="recaptchaToken">
 
-            <div class="max-w-md mx-auto mt-8">
-            <div class="border border-gray-300 rounded-md">
-            <!-- アコーディオンヘッダー -->
-            <button id="accordion-button" 
-                    class="w-full px-4 py-2 text-left font-bold bg-gray-100 hover:bg-gray-200 focus:outline-none flex justify-between items-center">
-              <span>注意事項</span>
-              <svg id="accordion-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" 
-                class="w-5 h-5 transform transition-transform">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            <!-- アコーディオンコンテンツ -->
-            <div id="accordion-content" class="px-4 py-3 hidden border-t border-gray-300 bg-white text-sm text-gray-700 space-y-2">
-              <p>通常2日以内に回答いたします。<br>
-                t98.infoドメインより送信しますので事前に受信許可設定をお願いいたします。<br>
-                XのDMで返信を希望される場合は本文中にIDを明記ください。<br>
-                確認画面はありません。
-              </p>
-            </div>
-            </div>
+            <div class="max-w-md mx-auto m-4">
+                <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4" role="alert">
+                    <p class="font-bold">ご確認ください</p>
+                    <p class="text-sm">通常2日以内に回答いたします。</p>
+                    <p class="text-sm">メールは<code>t98.info</code>ドメインより送信します。事前に受信許可設定をお願いいたします。</p>
+                    <p class="text-sm">XのDMで返信を希望される場合は本文中にIDを明記してください。</p>
+                    <p class="text-sm">確認画面はありません。</p>
+                </div>
             </div>
 
             <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
