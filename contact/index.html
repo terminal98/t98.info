@@ -58,9 +58,11 @@
         document.addEventListener("DOMContentLoaded", function () {
             const form = document.getElementById("contact-form");
             const alertBox = document.getElementById("alert-box");
+            const submitButton = form.querySelector('button[type="submit"]');
 
             form.addEventListener("submit", function (event) {
                 event.preventDefault();
+                disableButton(true); // ボタンを無効化しローディング表示
                 grecaptcha.ready(function () {
                     grecaptcha.execute("6LdEkvgqAAAAAC0tn7ETJCRCe8Pxl9lhHCHxWaKK", { action: "submit" }).then(function (token) {
                         document.getElementById("recaptcha-token").value = token;
@@ -94,12 +96,30 @@
                     }
                 } catch (error) {
                     showAlert("通信エラーが発生しました。");
+                } finally {
+                    disableButton(false); // ボタンを再び有効化
                 }
             }
 
             function showAlert(message) {
                 alertBox.innerText = message;
                 alertBox.classList.remove("hidden");
+            }
+
+            function disableButton(isDisabled) {
+                if (isDisabled) {
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = `
+                        <svg class="animate-spin h-5 w-5 text-white inline-block mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                        </svg>
+                        送信中...
+                    `;
+                } else {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = "送信";
+                }
             }
         });
     </script>
