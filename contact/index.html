@@ -50,19 +50,6 @@
     </div>
 
     <script>
-        document.getElementById('accordion-button').addEventListener('click', function () {
-            const content = document.getElementById('accordion-content');
-            const icon = document.getElementById('accordion-icon');
-        
-            if (content.classList.contains('hidden')) {
-                content.classList.remove('hidden');
-                icon.classList.add('rotate-180'); // 矢印アイコンを回転
-            } else {
-                content.classList.add('hidden');
-                icon.classList.remove('rotate-180');
-            }
-        });
-
         document.addEventListener("DOMContentLoaded", function () {
             const form = document.getElementById("contact-form");
             const alertBox = document.getElementById("alert-box");
