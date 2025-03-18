@@ -8,46 +8,48 @@
     <script src="https://www.google.com/recaptcha/api.js?render=6LdEkvgqAAAAAC0tn7ETJCRCe8Pxl9lhHCHxWaKK" async defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<body class="lex flex-col items-center justify-between min-h-screen bg-gray-100" style="min-height: calc(100vh - 4rem)">
 
-    <div class="w-full max-w-lg bg-white p-8 shadow-lg rounded-lg">
-        <h2 class="text-2xl font-bold mb-6 text-center">にじてくと お問い合わせ</h2>
-
-        <!-- エラー表示用 -->
-        <div id="alert-box" class="hidden bg-red-500 text-white text-center p-2 rounded mb-4"></div>
-
-        <form id="contact-form">
-            <div class="mb-4">
-                <label class="block text-gray-700 font-semibold mb-2">お名前</label>
-                <input type="text" name="name" required class="w-full p-2 border rounded">
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-gray-700 font-semibold mb-2">メールアドレス</label>
-                <input type="email" name="email" required class="w-full p-2 border rounded">
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-gray-700 font-semibold mb-2">お問い合わせ内容</label>
-                <textarea name="message" required class="w-full p-2 border rounded" rows="4"></textarea>
-            </div>
-
-            <input type="hidden" id="recaptcha-token" name="recaptchaToken">
-
-            <div class="max-w-md mx-auto m-4">
-                <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4" role="alert">
-                    <p class="font-bold">ご確認ください</p>
-                    <p class="text-sm">通常2日以内に回答いたします。</p>
-                    <p class="text-sm">メールは<code>t98.info</code>ドメインより送信します。事前に受信許可設定をお願いいたします。</p>
-                    <p class="text-sm">XのDMで返信を希望される場合は本文中にIDを明記してください。</p>
-                    <p class="text-sm">確認画面はありません。</p>
+    <div class="flex-grow flex items-center justify-center">
+        <div class="w-full max-w-lg bg-white p-8 shadow-lg rounded-lg">
+            <h2 class="text-2xl font-bold mb-6 text-center">にじてくと お問い合わせ</h2>
+    
+            <!-- エラー表示用 -->
+            <div id="alert-box" class="hidden bg-red-500 text-white text-center p-2 rounded mb-4"></div>
+    
+            <form id="contact-form">
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-semibold mb-2">お名前</label>
+                    <input type="text" name="name" required class="w-full p-2 border rounded">
                 </div>
-            </div>
-
-            <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
-                送信
-            </button>
-        </form>
+    
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-semibold mb-2">メールアドレス</label>
+                    <input type="email" name="email" required class="w-full p-2 border rounded">
+                </div>
+    
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-semibold mb-2">お問い合わせ内容</label>
+                    <textarea name="message" required class="w-full p-2 border rounded" rows="4"></textarea>
+                </div>
+    
+                <input type="hidden" id="recaptcha-token" name="recaptchaToken">
+    
+                <div class="max-w-md mx-auto m-4">
+                    <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4" role="alert">
+                        <p class="font-bold">ご確認ください</p>
+                        <p class="text-sm">通常2日以内に回答いたします。</p>
+                        <p class="text-sm">メールは<code>t98.info</code>ドメインより送信します。事前に受信許可設定をお願いいたします。</p>
+                        <p class="text-sm">XのDMで返信を希望される場合は本文中にIDを明記してください。</p>
+                        <p class="text-sm">確認画面はありません。</p>
+                    </div>
+                </div>
+    
+                <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
+                    送信
+                </button>
+            </form>
+        </div>
     </div>
     
     <footer class="w-full text-center py-4 text-gray-500 text-sm">&copy; 2025 NIJITECT. All Rights Reserved.</footer>
