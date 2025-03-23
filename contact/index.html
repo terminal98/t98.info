@@ -92,11 +92,10 @@
                     if (response.ok && result.success) {
                         window.location.href = result.redirect; // 送信完了画面へ遷移
                     } else {
-                        showAlert(result.error || "メール送信に失敗しました。");
+                        showAlert(result.error || "送信に失敗しました。時間をおいて再度お試しください。");
                     }
                 } catch (error) {
-                    console.log(error);
-                    showAlert("通信エラーが発生しました。");
+                    showAlert("時間をおいて再度お試しください。");
                 } finally {
                     disableButton(false); // ボタンを再び有効化
                 }
