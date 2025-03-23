@@ -95,6 +95,7 @@
                         showAlert(result.error || "メール送信に失敗しました。");
                     }
                 } catch (error) {
+                    console.log(error);
                     showAlert("通信エラーが発生しました。");
                 } finally {
                     disableButton(false); // ボタンを再び有効化
