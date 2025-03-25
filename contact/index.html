@@ -128,10 +128,6 @@
                 alertBox.classList.remove("hidden");
             }
 
-            function hideAlert() {
-                alertBox.classList.add("hidden");
-            }
-
             function disableButton(isDisabled) {
                 if (isDisabled) {
                     submitButton.disabled = true;
@@ -148,6 +144,10 @@
                 }
             }
         });
+        
+        function hideAlert() {
+            alertBox.classList.add("hidden");
+        }
     </script>
 
 </body>
