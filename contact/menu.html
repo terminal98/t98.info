@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>お問い合わせ</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --text-primary: #1a202c;
+      --text-secondary: #4a5568;
+      --border-color: #e2e8f0;
+      --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      --gradient-x: linear-gradient(135deg, #1da1f2, #0d8bd9);
+      --gradient-ig: linear-gradient(135deg, #e4405f, #833ab4, #fd5949);
+      --gradient-mail: linear-gradient(135deg, #667eea, #764ba2);
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #1a202c;
+      --bg-secondary: #2d3748;
+      --text-primary: #f7fafc;
+      --text-secondary: #cbd5e0;
+      --border-color: #4a5568;
+      --shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      transition: all 0.3s ease;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-image:
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%);
+    }
+
+    .container {
+      max-width: 500px;
+      width: 90%;
+      padding: 2rem;
+      background: var(--bg-secondary);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #1da1f2, #e4405f, #833ab4, #667eea);
+      animation: shimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.7;
+      }
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      position: relative;
+    }
+
+    .theme-toggle {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: var(--bg-primary);
+      border: 2px solid var(--border-color);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1.2rem;
+    }
+
+    .theme-toggle:hover {
+      transform: rotate(180deg) scale(1.1);
+      box-shadow: var(--shadow);
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      font-weight: 400;
+    }
+
+    .contact-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .contact-button {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1.5rem;
+      border-radius: 15px;
+      text-decoration: none;
+      color: white;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .contact-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .contact-button:hover::before {
+      left: 100%;
+    }
+
+    .contact-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .contact-button:active {
+      transform: translateY(-1px);
+    }
+
+    .button-content {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .button-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .help-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: white;
+    }
+
+    .help-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
+    }
+
+    .x-button {
+      background: var(--gradient-x);
+    }
+
+    .instagram-button {
+      background: var(--gradient-ig);
+    }
+
+    .email-button {
+      background: var(--gradient-mail);
+    }
+
+    .icon {
+      font-size: 1.5rem;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal-content {
+      background-color: var(--bg-secondary);
+      margin: 10% auto;
+      padding: 2rem;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      position: relative;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .close {
+      position: absolute;
+      right: 1rem;
+      top: 1rem;
+      color: var(--text-secondary);
+      font-size: 2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .close:hover {
+      color: var(--text-primary);
+    }
+
+    .modal h2 {
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+      font-size: 1.5rem;
+    }
+
+    .modal p {
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .modal ul {
+      color: var(--text-secondary);
+      margin-left: 1.5rem;
+      line-height: 1.8;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 1.5rem;
+        margin: 1rem;
+      }
+
+      h1 {
+        font-size: 1.7rem;
+      }
+
+      .contact-button {
+        padding: 1rem 1.25rem;
+        font-size: 1rem;
+      }
+
+      .icon {
+        font-size: 1.3rem;
+      }
+
+      .modal-content {
+        margin: 20% auto;
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon" id="themeIcon"></i>
+      </button>
+      <h1>お問い合わせ</h1>
+      <p class="subtitle">お気軽にご連絡ください</p>
+    </div>
+
+    <div class="contact-buttons">
+      <a href="https://x.com/98tml" target="_blank" class="contact-button x-button">
+        <div class="button-content">
+          <i class="fab fa-x-twitter icon"></i>
+          <span>X (Twitter)</span>
+        </div>
+        <div class="button-actions">
+          <button class="help-btn" onclick="openModal('x-modal')">
+            <i class="fas fa-question"></i>
+          </button>
+        </div>
+      </a>
+
+      <a href="https://www.instagram.com/98tml/" target="_blank" class="contact-button instagram-button">
+        <div class="button-content">
+          <i class="fab fa-instagram icon"></i>
+          <span>Instagram</span>
+        </div>
+        <div class="button-actions">
+          <button class="help-btn" onclick="openModal('instagram-modal')">
+            <i class="fas fa-question"></i>
+          </button>
+        </div>
+      </a>
+
+      <a href="https://www.t98.info/contact/" target="_blank" class="contact-button email-button">
+        <div class="button-content">
+          <i class="fas fa-envelope icon"></i>
+          <span>メールフォーム</span>
+        </div>
+        <div class="button-actions">
+          <button class="help-btn" onclick="openModal('email-modal')">
+            <i class="fas fa-question"></i>
+          </button>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- X Modal -->
+  <div id="x-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('x-modal')">&times;</span>
+      <h2><i class="fab fa-x-twitter"></i> Xでのお問い合わせ方法</h2>
+      <p>Xを通じてお問い合わせいただく場合の方法をご案内します。</p>
+      <ul>
+        <li><strong>ダイレクトメッセージ：</strong>プロフィールページからDMを送信してください</li>
+        <li><strong>メンション：</strong>@98tml をつけてツイートしてください</li>
+        <li><strong>リプライ：</strong>投稿に直接返信してください</li>
+        <li><strong>営業時間：</strong>平日9:00-18:00に対応いたします</li>
+        <li><strong>注意：</strong>個人情報を含む内容はDMでお送りください</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Instagram Modal -->
+  <div id="instagram-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('instagram-modal')">&times;</span>
+      <h2><i class="fab fa-instagram"></i> Instagramでのお問い合わせ方法</h2>
+      <p>Instagramを通じてお問い合わせいただく場合の方法をご案内します。</p>
+      <ul>
+        <li><strong>ダイレクトメッセージ：</strong>プロフィールページから「メッセージ」ボタンをタップ</li>
+        <li><strong>ストーリーズ返信：</strong>ストーリーズに対してコメントしてください</li>
+        <li><strong>投稿コメント：</strong>投稿にコメントしてください</li>
+        <li><strong>営業時間：</strong>平日9:00-18:00、土日祝日は対応が遅れる場合があります</li>
+        <li><strong>画像・動画：</strong>資料がある場合は画像や動画で送信可能です</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Email Modal -->
+  <div id="email-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('email-modal')">&times;</span>
+      <h2><i class="fas fa-envelope"></i> メールフォームでのお問い合わせ方法</h2>
+      <p>メールフォームを通じてお問い合わせいただく場合の方法をご案内します。</p>
+      <ul>
+        <li><strong>必須項目：</strong>お名前、メールアドレス、件名、お問い合わせ内容</li>
+        <li><strong>返信時間：</strong>営業日48時間以内に返信いたします</li>
+        <li><strong>ファイル添付：</strong>画像や資料の添付が可能です（最大10MB）</li>
+        <li><strong>緊急の場合：</strong>お急ぎの方はX・Instagramもご利用ください</li>
+        <li><strong>自動返信：</strong>送信後、確認メールが届きます</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const body = document.body;
+
+    // Check for saved theme preference or default to light mode
+    const currentTheme = sessionStorage.getItem('theme') || 'light';
+    body.setAttribute('data-theme', currentTheme);
+    updateThemeIcon(currentTheme);
+
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = body.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+      body.setAttribute('data-theme', newTheme);
+      sessionStorage.setItem('theme', newTheme);
+      updateThemeIcon(newTheme);
+    });
+
+    function updateThemeIcon(theme) {
+      if (theme === 'dark') {
+        themeIcon.className = 'fas fa-sun';
+      } else {
+        themeIcon.className = 'fas fa-moon';
+      }
+    }
+
+    // Modal functionality
+    function openModal(modalId) {
+      document.getElementById(modalId).style.display = 'block';
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+
+    // Close modal when clicking outside of it
+    window.addEventListener('click', (event) => {
+      if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+      }
+    });
+
+    // Add keyboard support for modals
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+          modal.style.display = 'none';
+        });
+      }
+    });
+
+    // Prevent help button clicks from triggering link navigation
+    document.querySelectorAll('.help-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+    });
+  </script>
+</body>
+
+</html>
