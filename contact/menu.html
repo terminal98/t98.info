@@ -20,7 +20,7 @@
       --text-secondary: #4a5568;
       --border-color: #e2e8f0;
       --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-      --gradient-x: linear-gradient(135deg, #1da1f2, #0d8bd9);
+      --gradient-x: linear-gradient(135deg, #000000, #333333);
       --gradient-ig: linear-gradient(135deg, #e4405f, #833ab4, #fd5949);
       --gradient-mail: linear-gradient(135deg, #667eea, #764ba2);
     }
@@ -341,8 +341,11 @@
     <div class="contact-buttons">
       <a href="https://x.com/98tml" target="_blank" class="contact-button x-button">
         <div class="button-content">
-          <i class="fab fa-x-twitter icon"></i>
-          <span>X (Twitter)</span>
+          <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+            <path
+              d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+          </svg>
+          <span>X</span>
         </div>
         <div class="button-actions">
           <button class="help-btn" onclick="openModal('x-modal')">
@@ -381,7 +384,11 @@
   <div id="x-modal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeModal('x-modal')">&times;</span>
-      <h2><i class="fab fa-x-twitter"></i> Xでのお問い合わせ方法</h2>
+      <h2><svg style="width: 24px; height: 24px; display: inline-block; vertical-align: middle; margin-right: 8px;"
+          viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+        </svg> Xでのお問い合わせ方法</h2>
       <p>Xを通じてお問い合わせいただく場合の方法をご案内します。</p>
       <ul>
         <li><strong>ダイレクトメッセージ：</strong>プロフィールページからDMを送信してください</li>
