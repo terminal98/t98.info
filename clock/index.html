@@ -166,14 +166,6 @@
       minuteElement.textContent = padZero(now.getMinutes());
       secondElement.textContent = padZero(seconds);
 
-      // --- コロン点滅処理 ---
-      // 秒数が偶数か奇数かで表示・非表示を切り替える
-      const isVisible = seconds % 2 === 0;
-      colonElements.forEach(colon => {
-        colon.style.visibility = isVisible ? 'visible' : 'hidden';
-      });
-      // --- ここまで ---
-
       // 日付部分は変更なし
       const month = now.getMonth() + 1;
       const day = now.getDate();
