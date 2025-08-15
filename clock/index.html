@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NTP Digital Clock (Responsive)</title>
+
+  <style>
+    /* 基本的なリセットと全体設定 */
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      /* スクロールバーを非表示 */
+    }
+
+    /* 時計全体のコンテナ設定 */
+    #clock-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100vh;
+      /* 画面全体の高さ */
+      background-color: #000000;
+      /* 背景色: 黒 */
+      color: #ffffff;
+      /* 文字色: 白 */
+      /* フォントをQuicksandに変更 */
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      font-weight: 700;
+      /* Google Fontで読み込んだウェイト(bold) */
+      text-align: center;
+      cursor: pointer;
+      /* クリック可能であることを示すカーソル */
+    }
+
+    /* 1段目: 時刻表示 */
+    #time {
+      line-height: 1.0;
+      display: flex;
+      /* 各パーツを横並びにする */
+      align-items: baseline;
+      /* テキストのベースラインを揃える */
+    }
+
+    /* --- フォント変更のためのスタイル --- */
+    /* 数字部分のスタイル */
+    .mono {
+      /* font-familyとfont-weightは#clock-containerから継承 */
+      /* 数字を等幅のように表示させるための設定 (jiggle防止) */
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* コロン部分のスタイル */
+    .colon {
+      /* font-familyとfont-weightは#clock-containerから継承 */
+      margin: 0 0.05em;
+      /* コロンの左右の余白を少し詰める */
+      transition: visibility 0s;
+      /* 点滅を滑らかにするための設定 */
+    }
+
+    /* --- ここまで --- */
+
+    /* 2段目: 日付と曜日表示 */
+    #date {
+      line-height: 1.2;
+    }
+
+    /* NTP同期ステータス表示 */
+    #ntp-status {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 14px;
+      color: #ffffff;
+      /* 文字色は白 */
+      font-family: 'Arial', sans-serif;
+      /* ステータス部分は別フォント */
+      font-weight: bold;
+      z-index: 10;
+      /* 時計より手前に表示 */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ステータスごとの背景色 */
+    .ntp-syncing {
+      background-color: #f0ad4e;
+      /* 黄色 (通信中) */
+    }
+
+    .ntp-success {
+      background-color: #5cb85c;
+      /* 緑色 (成功) */
+    }
+
+    .ntp-error {
+      background-color: #808080;
+      /* グレー (失敗) */
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NTPステータス表示用の要素 -->
+  <div id="ntp-status" class="ntp-error">NTP</div>
+
+  <div id="clock-container">
+    <!-- 時刻表示の構造を変更 -->
+    <div id="time">
+      <span id="hour" class="mono">--</span>
+      <span class="colon">:</span>
+      <span id="minute" class="mono">--</span>
+      <span class="colon">:</span>
+      <span id="second" class="mono">--</span>
+    </div>
+    <div id="date">--月--日(-)</div>
+  </div>
+
+  <script>
+    // --- 要素の取得 ---
+    const timeElement = document.getElementById('time');
+    const dateElement = document.getElementById('date');
+    const ntpStatusElement = document.getElementById('ntp-status');
+    const clockContainer = document.getElementById('clock-container');
+
+    // 時・分・秒の各要素を取得
+    const hourElement = document.getElementById('hour');
+    const minuteElement = document.getElementById('minute');
+    const secondElement = document.getElementById('second');
+    // コロン要素を取得（複数）
+    const colonElements = document.querySelectorAll('.colon');
+
+    const week = ['日', '月', '火', '水', '木', '金', '土'];
+    let timeOffset = 0; // NTPサーバーとの時刻差（ミリ秒）
+
+    /**
+     * 数字を2桁のゼロ埋め文字列に変換する
+     * @param {number} num - 対象の数値
+     * @returns {string} - 2桁にフォーマットされた文字列
+     */
+    function padZero(num) {
+      return num.toString().padStart(2, '0');
+    }
+
+    /**
+     * 時刻と日付を画面に描画する
+     */
+    function displayTime() {
+      const now = new Date(Date.now() + timeOffset);
+      const seconds = now.getSeconds();
+
+      // 時・分・秒を個別の要素に設定
+      hourElement.textContent = padZero(now.getHours());
+      minuteElement.textContent = padZero(now.getMinutes());
+      secondElement.textContent = padZero(seconds);
+
+      // --- コロン点滅処理 ---
+      // 秒数が偶数か奇数かで表示・非表示を切り替える
+      const isVisible = seconds % 2 === 0;
+      colonElements.forEach(colon => {
+        colon.style.visibility = isVisible ? 'visible' : 'hidden';
+      });
+      // --- ここまで ---
+
+      // 日付部分は変更なし
+      const month = now.getMonth() + 1;
+      const day = now.getDate();
+      const dayOfWeek = week[now.getDay()];
+      dateElement.textContent = `${month}月${day}日(${dayOfWeek})`;
+    }
+
+    /**
+     * NTPサーバーから時刻を取得し、ローカル時刻との差分を計算する（リトライ機能付き）
+     * @param {number} maxRetries - 最大リトライ回数
+     * @param {number} retryDelay - リトライ間隔（ミリ秒）
+     */
+    async function syncTimeWithNTP(maxRetries = 3, retryDelay = 3000) {
+      // ステータスを「通信中」に更新
+      ntpStatusElement.className = 'ntp-syncing';
+      ntpStatusElement.textContent = 'NTP';
+      ntpStatusElement.title = 'NTPサーバーと同期中...';
+
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          const response = await fetch('https://worldtimeapi.org/api/ip');
+          if (!response.ok) throw new Error(`NTPサーバーへの接続に失敗しました (ステータス: ${response.status})`);
+
+          const data = await response.json();
+          const serverTime = new Date(data.utc_datetime).getTime();
+          timeOffset = serverTime - Date.now();
+          console.log(`NTPサーバーとの時刻同期が完了しました。(試行回数: ${attempt}回)`);
+
+          // ステータスを「成功」に更新
+          ntpStatusElement.className = 'ntp-success';
+          ntpStatusElement.title = `NTP同期成功 (最終同期: ${new Date().toLocaleTimeString()})`;
+          return; // 成功したので関数を抜ける
+
+        } catch (error) {
+          console.warn(`NTP同期試行 ${attempt}回目失敗: ${error.message}`);
+          if (attempt < maxRetries) {
+            // 次のリトライまで待機
+            await new Promise(resolve => setTimeout(resolve, retryDelay));
+          }
+        }
+      }
+
+      // すべてのリトライが失敗した場合
+      console.warn('NTP同期に最終的に失敗しました。端末のローカル時刻を使用します。');
+      timeOffset = 0;
+
+      // ステータスを「失敗」に更新
+      ntpStatusElement.className = 'ntp-error';
+      ntpStatusElement.title = 'NTP同期失敗。ローカル時刻を使用しています。';
+    }
+
+    /**
+     * ウィンドウサイズに合わせてフォントサイズを調整する
+     */
+    function adjustFontSize() {
+      const containerWidth = document.getElementById('clock-container').clientWidth;
+      // 横幅を基準に、文字がはみ出さない最適なサイズを算出
+      const timeFontSize = containerWidth / 5;
+      // 日付表示のフォントサイズを、時刻との比率を保って計算
+      const dateFontSize = timeFontSize / 3.5;
+
+      timeElement.style.fontSize = `${timeFontSize}px`;
+      dateElement.style.fontSize = `${dateFontSize}px`;
+    }
+
+    /**
+     * 全画面表示を切り替える
+     */
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        // 現在全画面でなければ、全画面にする
+        document.documentElement.requestFullscreen().catch(err => {
+          // エラーはコンソールに出力する
+          console.error(`全画面表示にできませんでした: ${err.message} (${err.name})`);
+        });
+      } else {
+        // 現在全画面であれば、解除する
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // --- メイン処理 ---
+    (() => {
+      // 最初に一度フォントサイズを調整
+      adjustFontSize();
+
+      // ウィンドウサイズが変更されたときにもフォントサイズを再調整
+      window.addEventListener('resize', adjustFontSize);
+
+      // 時計コンテナ（文字部分含む）にクリックイベントを追加して全画面切り替え
+      clockContainer.addEventListener('click', toggleFullScreen);
+
+      // まずは端末のローカル時刻で表示を開始する
+      displayTime(); // 読み込み後すぐに一度表示
+      setInterval(displayTime, 1000); // 1秒ごとに更新
+
+      // NTP同期をバックグラウンドで開始する (await しない)
+      syncTimeWithNTP();
+
+      // 1時間ごとにNTPサーバーと再同期
+      setInterval(syncTimeWithNTP, 3600000);
+    })();
+
+  </script>
+
+</body>
+
+</html>
