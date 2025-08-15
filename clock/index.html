@@ -194,7 +194,7 @@
 
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
-          const response = await fetch('http://worldtimeapi.org/api/timezone/Asia/Tokyo');
+          const response = await fetch('https://worldtimeapi.org/api/timezone/Asia/Tokyo');
           if (!response.ok) throw new Error(`NTPサーバーへの接続に失敗しました (ステータス: ${response.status})`);
 
           const data = await response.json();
