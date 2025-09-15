@@ -4,7 +4,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NTP Digital Clock (Responsive)</title>
+  <title>NTP Digital Clock with Timer</title>
+
+  <!-- Web App Manifest とテーマカラーを追加 -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
 
   <style>
     /* 基本的なリセットと全体設定 */
@@ -31,10 +35,8 @@
       /* 背景色: 黒 */
       color: #ffffff;
       /* 文字色: 白 */
-      /* フォントをQuicksandに変更 */
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
       font-weight: 700;
-      /* Google Fontで読み込んだウェイト(bold) */
       text-align: center;
       cursor: pointer;
       /* クリック可能であることを示すカーソル */
@@ -44,34 +46,62 @@
     #time {
       line-height: 1.0;
       display: flex;
-      /* 各パーツを横並びにする */
       align-items: baseline;
-      /* テキストのベースラインを揃える */
     }
 
-    /* --- フォント変更のためのスタイル --- */
     /* 数字部分のスタイル */
     .mono {
-      /* font-familyとfont-weightは#clock-containerから継承 */
-      /* 数字を等幅のように表示させるための設定 (jiggle防止) */
       font-variant-numeric: tabular-nums;
     }
 
     /* コロン部分のスタイル */
     .colon {
-      /* font-familyとfont-weightは#clock-containerから継承 */
       margin: 0 0.05em;
-      /* コロンの左右の余白を少し詰める */
-      transition: visibility 0s;
-      /* 点滅を滑らかにするための設定 */
     }
 
-    /* --- ここまで --- */
-
-    /* 2段目: 日付と曜日表示 */
-    #date {
+    /* 2段目: 日付とタイマー表示 */
+    #date-container {
+      display: flex;
+      justify-content: center;
+      align-items: baseline;
+      flex-wrap: wrap;
+      /* 画面が狭い場合に折り返す */
       line-height: 1.2;
     }
+
+    #date {
+      margin-right: 0.5em;
+      /* 日付とタイマーの間に余白 */
+    }
+
+    .unit {
+      font-size: 0.6em;
+      /* 数字に対してフォントを小さくする */
+      font-weight: normal;
+      /* 少し細字にする */
+      margin: 0 0.1em;
+    }
+
+    /* 残り時間表示のスタイル */
+    #timer-display {
+      font-weight: bold;
+    }
+
+    .timer-green {
+      color: #5cb85c;
+    }
+
+    /* 90分以上: 緑 */
+    .timer-yellow {
+      color: #f0ad4e;
+    }
+
+    /* 30-90分: 黄 */
+    .timer-red {
+      color: #d9534f;
+    }
+
+    /* 30分未満: 赤 */
 
     /* NTP同期ステータス表示 */
     #ntp-status {
@@ -82,42 +112,143 @@
       border-radius: 5px;
       font-size: 14px;
       color: #ffffff;
-      /* 文字色は白 */
       font-family: 'Arial', sans-serif;
-      /* ステータス部分は別フォント */
       font-weight: bold;
       z-index: 10;
-      /* 時計より手前に表示 */
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    /* ステータスごとの背景色 */
     .ntp-syncing {
       background-color: #f0ad4e;
-      /* 黄色 (通信中) */
     }
 
     .ntp-success {
       background-color: #5cb85c;
-      /* 緑色 (成功) */
     }
 
     .ntp-error {
       background-color: #808080;
-      /* グレー (失敗) */
+    }
+
+    /* --- タイマー設定関連のスタイル --- */
+    #settings-icon {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      z-index: 1001;
+      transition: transform 0.2s ease-in-out;
+    }
+
+    #settings-icon:hover {
+      transform: rotate(45deg);
+    }
+
+    #settings-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+
+    #settings-modal.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background-color: #2c2c2c;
+      padding: 25px;
+      border-radius: 10px;
+      color: #fff;
+      text-align: center;
+      font-family: 'Arial', sans-serif;
+      width: 90%;
+      max-width: 380px;
+    }
+
+    .modal-content h2 {
+      margin-top: 0;
+      font-size: 1.5em;
+    }
+
+    .time-input-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 20px 0;
+    }
+
+    .time-input-container button {
+      font-size: 1.5em;
+      width: 40px;
+      height: 40px;
+      margin: 0 10px;
+    }
+
+    #time-input {
+      font-size: 2em;
+      width: 120px;
+      text-align: center;
+      border: 1px solid #555;
+      background-color: #333;
+      color: #fff;
+      border-radius: 5px;
+    }
+
+    .quick-adjust-buttons button {
+      margin: 5px;
+      padding: 8px 12px;
+    }
+
+    .sound-toggle {
+      margin-top: 20px;
+      font-size: 1.1em;
+    }
+
+    .modal-actions {
+      margin-top: 25px;
+    }
+
+    .modal-actions button {
+      padding: 10px 20px;
+      font-size: 1.1em;
+      margin: 0 10px;
+      cursor: pointer;
+      border-radius: 5px;
+      border: none;
+    }
+
+    #save-settings {
+      background-color: #5cb85c;
+      color: white;
+    }
+
+    #cancel-timer {
+      background-color: #d9534f;
+      color: white;
     }
   </style>
 </head>
 
 <body>
-
   <!-- NTPステータス表示用の要素 -->
   <div id="ntp-status" class="ntp-error">NTP</div>
 
   <div id="clock-container">
-    <!-- 時刻表示の構造を変更 -->
     <div id="time">
       <span id="hour" class="mono">--</span>
       <span class="colon">:</span>
@@ -125,8 +256,48 @@
       <span class="colon">:</span>
       <span id="second" class="mono">--</span>
     </div>
-    <div id="date">--月--日(-)</div>
+    <div id="date-container">
+      <div id="date">--月--日(-)</div>
+      <div id="timer-display"></div>
+    </div>
   </div>
+
+  <!-- タイマー設定アイコン (SVG) -->
+  <div id="settings-icon">
+    <svg viewBox="0 0 24 24" fill="white">
+      <path
+        d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61-.25-1.17-.59-1.69-.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61-.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z" />
+    </svg>
+  </div>
+
+  <!-- タイマー設定モーダル -->
+  <div id="settings-modal">
+    <div class="modal-content">
+      <h2>タイマー設定</h2>
+      <div class="time-input-container">
+        <button id="dec-15min">-</button>
+        <input type="time" id="time-input">
+        <button id="inc-15min">+</button>
+      </div>
+      <div class="quick-adjust-buttons">
+        <button data-adjust="30">+30分</button>
+        <button data-adjust="60">+1時間</button>
+      </div>
+      <div class="sound-toggle">
+        <label>
+          <input type="checkbox" id="sound-checkbox" checked>
+          通知音を鳴らす
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button id="save-settings">設定</button>
+        <button id="cancel-timer">解除</button>
+      </div>
+    </div>
+  </div>
+
+  <audio id="alarm-sound" src="beep.mp3" preload="auto"></audio>
+
 
   <script>
     // --- 要素の取得 ---
@@ -134,52 +305,91 @@
     const dateElement = document.getElementById('date');
     const ntpStatusElement = document.getElementById('ntp-status');
     const clockContainer = document.getElementById('clock-container');
-
-    // 時・分・秒の各要素を取得
     const hourElement = document.getElementById('hour');
     const minuteElement = document.getElementById('minute');
     const secondElement = document.getElementById('second');
-    // コロン要素を取得（複数）
-    const colonElements = document.querySelectorAll('.colon');
+    const timerDisplayElement = document.getElementById('timer-display');
+    const settingsIcon = document.getElementById('settings-icon');
+    const settingsModal = document.getElementById('settings-modal');
+    const timeInput = document.getElementById('time-input');
+    const soundCheckbox = document.getElementById('sound-checkbox');
+    const alarmSound = document.getElementById('alarm-sound');
 
     const week = ['日', '月', '火', '水', '木', '金', '土'];
-    let timeOffset = 0; // NTPサーバーとの時刻差（ミリ秒）
+    let timeOffset = 0;
+    let targetDate = null;
+    let soundEnabled = true;
+    const playedAlarms = new Set();
 
-    /**
-     * 数字を2桁のゼロ埋め文字列に変換する
-     * @param {number} num - 対象の数値
-     * @returns {string} - 2桁にフォーマットされた文字列
-     */
     function padZero(num) {
       return num.toString().padStart(2, '0');
     }
 
-    /**
-     * 時刻と日付を画面に描画する
-     */
     function displayTime() {
       const now = new Date(Date.now() + timeOffset);
-      const seconds = now.getSeconds();
-
-      // 時・分・秒を個別の要素に設定
       hourElement.textContent = padZero(now.getHours());
       minuteElement.textContent = padZero(now.getMinutes());
-      secondElement.textContent = padZero(seconds);
-
-      // 日付部分は変更なし
+      secondElement.textContent = padZero(now.getSeconds());
       const month = now.getMonth() + 1;
       const day = now.getDate();
       const dayOfWeek = week[now.getDay()];
-      dateElement.textContent = `${month}月${day}日(${dayOfWeek})`;
+      dateElement.innerHTML = `${month}<span class="unit">月</span>${day}<span class="unit">日(${dayOfWeek})</span>`;
+      updateTimerDisplay(now);
+    }
+
+    function updateTimerDisplay(now) {
+      if (!targetDate) {
+        timerDisplayElement.innerHTML = '';
+        return;
+      }
+      const remainingMs = targetDate.getTime() - now.getTime();
+      if (remainingMs <= 0) {
+        timerDisplayElement.innerHTML = '<span class="unit">時間です</span>';
+        timerDisplayElement.className = 'timer-red';
+        if (soundEnabled && !playedAlarms.has(0)) {
+          playSound();
+          playedAlarms.add(0);
+        }
+        return;
+      }
+      const remainingMinutes = Math.ceil(remainingMs / 60000);
+      if (remainingMinutes >= 90) {
+        const remainingHours = Math.ceil(remainingMs / 3600000);
+        timerDisplayElement.innerHTML = `<span class="unit">残り </span>${remainingHours}<span class="unit">時間</span>`;
+        timerDisplayElement.className = 'timer-green';
+      } else {
+        timerDisplayElement.innerHTML = `<span class="unit">残り </span>${remainingMinutes}<span class="unit">分</span>`;
+        timerDisplayElement.className = remainingMinutes < 30 ? 'timer-red' : 'timer-yellow';
+      }
+      const alarmPoints = [90, 60, 30, 15, 5, 1];
+      for (const point of alarmPoints) {
+        if (remainingMinutes === point && !playedAlarms.has(point)) {
+          if (soundEnabled) playSound();
+          playedAlarms.add(point);
+          break;
+        }
+      }
+    }
+
+    function playSound() {
+      alarmSound.currentTime = 0;
+      alarmSound.play().catch(error => console.error("音声の再生に失敗しました:", error));
     }
 
     /**
-     * NTPサーバーから時刻を取得し、ローカル時刻との差分を計算する（リトライ機能付き）
-     * @param {number} maxRetries - 最大リトライ回数
-     * @param {number} retryDelay - リトライ間隔（ミリ秒）
+     * MODIFIED: オフライン状態を最初にチェックするように変更
      */
     async function syncTimeWithNTP(maxRetries = 3, retryDelay = 3000) {
-      // ステータスを「通信中」に更新
+      // オフラインの場合は、NTP同期を試みずにローカル時刻を使用する
+      if (!navigator.onLine) {
+        console.warn('Offline. Using local time.');
+        timeOffset = 0;
+        ntpStatusElement.className = 'ntp-error';
+        ntpStatusElement.textContent = 'Offline';
+        ntpStatusElement.title = 'オフラインのため、端末の時刻を使用しています。';
+        return;
+      }
+
       ntpStatusElement.className = 'ntp-syncing';
       ntpStatusElement.textContent = 'NTP';
       ntpStatusElement.title = 'NTPサーバーと同期中...';
@@ -187,90 +397,142 @@
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
           const response = await fetch('https://worldtimeapi.org/api/timezone/Asia/Tokyo');
-          if (!response.ok) throw new Error(`NTPサーバーへの接続に失敗しました (ステータス: ${response.status})`);
-
+          if (!response.ok) throw new Error(`NTPサーバーエラー: ${response.status}`);
           const data = await response.json();
           const serverTime = new Date(data.utc_datetime).getTime();
           timeOffset = serverTime - Date.now();
-          console.log(`NTPサーバーとの時刻同期が完了しました。(試行回数: ${attempt}回)`);
-
-          // ステータスを「成功」に更新
+          console.log(`NTP同期完了 (試行: ${attempt}回)`);
           ntpStatusElement.className = 'ntp-success';
           ntpStatusElement.title = `NTP同期成功 (最終同期: ${new Date().toLocaleTimeString()})`;
-          return; // 成功したので関数を抜ける
-
+          return;
         } catch (error) {
-          console.warn(`NTP同期試行 ${attempt}回目失敗: ${error.message}`);
-          if (attempt < maxRetries) {
-            // 次のリトライまで待機
-            await new Promise(resolve => setTimeout(resolve, retryDelay));
-          }
+          console.warn(`NTP試行 ${attempt}回目失敗: ${error.message}`);
+          if (attempt < maxRetries) await new Promise(resolve => setTimeout(resolve, retryDelay));
         }
       }
 
-      // すべてのリトライが失敗した場合
-      console.warn('NTP同期に最終的に失敗しました。端末のローカル時刻を使用します。');
+      console.warn('NTP同期失敗。ローカル時刻を使用します。');
       timeOffset = 0;
-
-      // ステータスを「失敗」に更新
       ntpStatusElement.className = 'ntp-error';
       ntpStatusElement.title = 'NTP同期失敗。ローカル時刻を使用しています。';
     }
 
-    /**
-     * ウィンドウサイズに合わせてフォントサイズを調整する
-     */
     function adjustFontSize() {
-      const containerWidth = document.getElementById('clock-container').clientWidth;
-      // 横幅を基準に、文字がはみ出さない最適なサイズを算出
-      const timeFontSize = containerWidth / 5;
-      // 日付表示のフォントサイズを、時刻との比率を保って計算
+      const containerWidth = clockContainer.clientWidth;
+      const timeFontSize = containerWidth / 5.5;
       const dateFontSize = timeFontSize / 3.5;
-
       timeElement.style.fontSize = `${timeFontSize}px`;
-      dateElement.style.fontSize = `${dateFontSize}px`;
+      dateElement.parentElement.style.fontSize = `${dateFontSize}px`;
     }
 
-    /**
-     * 全画面表示を切り替える
-     */
     function toggleFullScreen() {
       if (!document.fullscreenElement) {
-        // 現在全画面でなければ、全画面にする
-        document.documentElement.requestFullscreen().catch(err => {
-          // エラーはコンソールに出力する
-          console.error(`全画面表示にできませんでした: ${err.message} (${err.name})`);
-        });
-      } else {
-        // 現在全画面であれば、解除する
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        }
+        document.documentElement.requestFullscreen().catch(err => console.error(`全画面表示エラー: ${err.message}`));
+      } else if (document.exitFullscreen) {
+        document.exitFullscreen();
       }
     }
 
-    // --- メイン処理 ---
-    (() => {
-      // 最初に一度フォントサイズを調整
-      adjustFontSize();
+    function openSettingsModal() {
+      if (targetDate && (targetDate.getTime() > (Date.now() + timeOffset))) {
+        timeInput.value = `${padZero(targetDate.getHours())}:${padZero(targetDate.getMinutes())}`;
+      } else {
+        const now = new Date(Date.now() + timeOffset);
+        timeInput.value = `${padZero(now.getHours())}:${padZero(now.getMinutes())}`;
+      }
+      settingsModal.classList.add('visible');
+    }
 
-      // ウィンドウサイズが変更されたときにもフォントサイズを再調整
+    function closeSettingsModal() {
+      settingsModal.classList.remove('visible');
+    }
+
+    function adjustTimeRound15(direction) {
+      const [h, m] = timeInput.value.split(':').map(Number);
+      const date = new Date();
+      date.setHours(h, m, 0, 0);
+
+      if (direction === 'increment') {
+        const newMinute = Math.ceil((m + 1) / 15) * 15;
+        date.setMinutes(newMinute);
+      } else if (direction === 'decrement') {
+        const minutesToProcess = (m === 0) ? 60 : m;
+        const newMinute = Math.floor((minutesToProcess - 1) / 15) * 15;
+        if (m === 0) {
+          date.setHours(date.getHours() - 1);
+        }
+        date.setMinutes(newMinute);
+      }
+      timeInput.value = `${padZero(date.getHours())}:${padZero(date.getMinutes())}`;
+    }
+
+    function adjustTime(minutes) {
+      const [h, m] = timeInput.value.split(':').map(Number);
+      const date = new Date();
+      date.setHours(h, m, 0, 0);
+      const currentMinutes = date.getMinutes();
+      const newMinute = Math.ceil((currentMinutes + 1) / minutes) * minutes;
+      date.setMinutes(newMinute);
+      timeInput.value = `${padZero(date.getHours())}:${padZero(date.getMinutes())}`;
+    }
+
+    function setupEventListeners() {
       window.addEventListener('resize', adjustFontSize);
-
-      // 時計コンテナ（文字部分含む）にクリックイベントを追加して全画面切り替え
       clockContainer.addEventListener('click', toggleFullScreen);
+      settingsIcon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openSettingsModal();
+      });
+      settingsModal.addEventListener('click', (e) => {
+        if (e.target === settingsModal) closeSettingsModal();
+      });
+      document.getElementById('save-settings').addEventListener('click', () => {
+        const [hours, minutes] = timeInput.value.split(':').map(Number);
+        targetDate = new Date(Date.now() + timeOffset);
+        targetDate.setHours(hours, minutes, 0, 0);
+        if (targetDate.getTime() < (Date.now() + timeOffset)) {
+          targetDate.setDate(targetDate.getDate() + 1);
+        }
+        soundEnabled = soundCheckbox.checked;
+        playedAlarms.clear();
+        closeSettingsModal();
+        displayTime();
+      });
+      document.getElementById('cancel-timer').addEventListener('click', () => {
+        targetDate = null;
+        closeSettingsModal();
+      });
+      document.getElementById('dec-15min').addEventListener('click', () => adjustTimeRound15('decrement'));
+      document.getElementById('inc-15min').addEventListener('click', () => adjustTimeRound15('increment'));
+      document.querySelectorAll('.quick-adjust-buttons button').forEach(button => {
+        button.addEventListener('click', () => {
+          const minutes = parseInt(button.dataset.adjust, 10);
+          adjustTime(minutes);
+        });
+      });
+    }
 
-      // まずは端末のローカル時刻で表示を開始する
-      displayTime(); // 読み込み後すぐに一度表示
-      setInterval(displayTime, 1000); // 1秒ごとに更新
-
-      // NTP同期をバックグラウンドで開始する (await しない)
+    (() => {
+      adjustFontSize();
+      setupEventListeners();
+      displayTime();
+      setInterval(displayTime, 1000);
       syncTimeWithNTP();
-
-      // 1時間ごとにNTPサーバーと再同期
       setInterval(syncTimeWithNTP, 3600000);
-    })();
 
+      // --- NEW: Service Worker の登録処理 ---
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./service-worker.js')
+            .then(registration => {
+              console.log('Service Worker registered with scope:', registration.scope);
+            })
+            .catch(err => {
+              console.error('Service Worker registration failed:', err);
+            });
+        });
+      }
+    })();
   </script>
 
 </body>
